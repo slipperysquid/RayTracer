@@ -1,3 +1,6 @@
+#include "Colour.h"
+#include "Vec3.h"
+
 #include <iostream>
 
 using namespace std;
@@ -13,16 +16,8 @@ int main(){
     for (int j = img_height - 1; j >= 0; j--){
         cerr << "\n Scanlines remaining: " << j << ' ' << flush;
         for(int i = 0; i < img_width; i++){
-
-            auto r_multiplyer = double(i) / (img_width - 1); //0 red on left full red on right
-            auto g_multiplyer = double(j) / (img_height - 1);//full green on top 0 green on bottom
-            auto b_multiplyer = 0.25;
-
-            int r = static_cast<int>(255.999 * r_multiplyer);
-            int g = static_cast<int>(255.999 * g_multiplyer);
-            int b = static_cast<int>(255.999 * b_multiplyer);
-
-            cout << r << " " << g << " " << b << "\n";
+            colour pixel_colour(double(i) / (img_width - 1), double(j) / (img_height - 1), 0.25);//making a coulour vector containing the colour multiplyers
+            write_colour(cout, pixel_colour);//printing colour value of pixel
         }
     }
 
