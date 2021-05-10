@@ -7,24 +7,30 @@
 using namespace std;
 
 
-bool hit_sphere(const point3& center, double radius, const Ray& r){
+double hit_sphere(const point3& center, double radius, const Ray& r){
     //checking if point on ray intersects with sphere by solving for t in t^2*b^2 + 2tb * (A - C) + (A - C)^2 - r^2 = 0
     Vec3 oc = r.get_origin() - center;
-    auto a = dot(r.get_direction(), r.get_direction());
-    auto b = 2.0 * dot(oc, r.get_direction());
-    auto c = dot(oc, oc) - radius * radius;
-    auto determinant = b * b - 4 * a * c;
-    return (determinant > 0);//returns true if the line has intersects with the sphere
+    auto a = r.get_direction().lengthSquared();
+    auto half_b = dot(oc, r.get_direction());
+    auto c = oc.lengthSquared() - radius * radius;
+    auto discriminant = half_b * half_b -  a * c;
+    if(discriminant < 0){
+        return -1.0;
+    } else {
+        return (-half_b - sqrt(discriminant)) / a;//solving for smallest t if it intersects
+    }
 }
 
 colour ray_colour(const Ray& r){
     //returns red if the ray intersects with sphere
-    if(hit_sphere(point3(0, 0, -1), 0.5, r)){
-        return colour(1, 0, 0);
+    auto t = hit_sphere(point3(0, 0, -1), 0.5, r);
+    if(t > 0.0){
+        Vec3 Normal = unit_vector(r.at(t) - Vec3(0, 0, -1));
+        return 0.5 * colour(Normal.get_x() + 1, Normal.get_y() + 1, Normal.get_z() + 1);
     }
     //linearly blends the ray between white and blue based on its unit vector
     Vec3 unit_direction = unit_vector(r.get_direction());   
-    auto t = 0.5 * (unit_direction.get_y() + 1.0);
+    t = 0.5 * (unit_direction.get_y() + 1.0);
     return (1.0 - t) * colour(1.0, 1.0, 1.0) + t * colour(0.5, 0.7, 1.0);
 }
 
