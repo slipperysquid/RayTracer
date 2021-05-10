@@ -13,7 +13,7 @@ class Ray{
     point3 get_origin() const {return origin;}
     Vec3 get_direction() const {return direction;}
 
-    point3 at(double t){
+    point3 at(double t) const {
         return origin + (t * direction);
     }
 
