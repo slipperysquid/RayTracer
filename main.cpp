@@ -7,11 +7,28 @@
 using namespace std;
 
 
+bool hit_sphere(const point3& center, double radius, const Ray& r){
+    //checking if point on ray intersects with sphere by solving for t in t^2*b^2 + 2tb * (A - C) + (A - C)^2 - r^2 = 0
+    Vec3 oc = r.get_origin() - center;
+    auto a = dot(r.get_direction(), r.get_direction());
+    auto b = 2.0 * dot(oc, r.get_direction());
+    auto c = dot(oc, oc) - radius * radius;
+    auto determinant = b * b - 4 * a * c;
+    return (determinant > 0);//returns true if the line has intersects with the sphere
+}
+
 colour ray_colour(const Ray& r){
-    Vec3 unit_direction = unit_vector(r.get_direction());
+    //returns red if the ray intersects with sphere
+    if(hit_sphere(point3(0, 0, -1), 0.5, r)){
+        return colour(1, 0, 0);
+    }
+    //linearly blends the ray between white and blue based on its unit vector
+    Vec3 unit_direction = unit_vector(r.get_direction());   
     auto t = 0.5 * (unit_direction.get_y() + 1.0);
     return (1.0 - t) * colour(1.0, 1.0, 1.0) + t * colour(0.5, 0.7, 1.0);
 }
+
+
 
 
 int main(){
@@ -22,7 +39,7 @@ int main(){
 
     //Camera
 
-    auto viewport_height = 2.0;
+    auto viewport_height = 2.0; 
     auto viewport_width = aspect_ratio * viewport_height;
     auto focal_length = 1.0;
 
@@ -30,7 +47,7 @@ int main(){
     //setting up view from camera
     auto horizontal = Vec3(viewport_width, 0, 0);
     auto vertical = Vec3(0, viewport_height, 0);
-    auto lower_left_corner = origin - vertical / 2 - horizontal / 2 - Vec3(0, 0, focal_length); 
+    auto lower_left_corner = origin - horizontal/2 - vertical/2 - Vec3(0, 0, focal_length); 
 
     //Render --- will write into a plain text PPM format
     cout << "P3\n" << img_width << " " << img_height << "\n255\n";
